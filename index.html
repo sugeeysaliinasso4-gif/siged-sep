@@ -118,23 +118,22 @@
             canvas.height = img.height;
             dibujar();
         };
-
         function dibujar() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0);
 
-            ctx.fillStyle = "#000000";
-            ctx.font = "bold 28px Arial";
-            ctx.textAlign = "center";
+    ctx.fillStyle = "#1a2c5e";
+    ctx.font = "bold 24px Arial";
+    ctx.textAlign = "center";
 
-            // Cambia estas coordenadas (Y) según tu plantilla
-            ctx.fillText(document.getElementById("nombre").value || "NOMBRE DEL ALUMNO", canvas.width/2, 280);
-            ctx.fillText(document.getElementById("curp").value || "CURP", canvas.width/2, 330);
-            ctx.fillText(document.getElementById("escuela").value || "ESCUELA", canvas.width/2, 390);
-            ctx.fillText(document.getElementById("cct").value || "CCT", canvas.width/2, 430);
-            ctx.fillText(document.getElementById("promedio").value || "PROMEDIO", canvas.width/2, 470);
-            ctx.fillText(document.getElementById("lugar").value || "LUGAR", canvas.width/2, 520);
-            ctx.fillText(document.getElementById("fecha").value || "FECHA", canvas.width/2, 560);
+    // Coordenadas optimizadas para tu plantilla
+    ctx.fillText(document.getElementById("nombre").value || "", canvas.width/2, 295);
+    ctx.fillText(document.getElementById("curp").value || "", canvas.width/2, 335);
+    ctx.fillText(document.getElementById("escuela").value || "", canvas.width/2, 415);
+    ctx.fillText(document.getElementById("cct").value || "", canvas.width/2, 455);
+    ctx.fillText(document.getElementById("promedio").value || "", canvas.width/2, 500);
+    ctx.fillText(document.getElementById("lugar").value || "", canvas.width/2, 565);
+    ctx.fillText(document.getElementById("fecha").value || "", canvas.width/2, 605);
         }
 
         // Actualizar en tiempo real
