@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validación de Certificado SEP</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background: #f0f2f5; 
+            margin: 0; 
+            padding: 20px; 
+        }
+        .cert { 
+            max-width: 800px; 
+            margin: 40px auto; 
+            background: white; 
+            padding: 40px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2); 
+            text-align: center; 
+        }
+        h1 { color: #0a2f74; }
+        h2 { color: #333; }
+        .dato { 
+            margin: 18px 0; 
+            font-size: 19px; 
+            padding: 8px; 
+            background: #f8f9fa; 
+            border-radius: 6px; 
+        }
+        .valido { 
+            color: green; 
+            font-size: 26px; 
+            font-weight: bold; 
+            margin: 30px 0; 
+        }
+    </style>
+</head>
+<body>
+    <div class="cert">
+        <h1>GOBIERNO DE MÉXICO</h1>
+        <h2>SECRETARÍA DE EDUCACIÓN PÚBLICA</h2>
+        <hr>
+        <h3>✅ Certificado Validado</h3>
+        
+        <div id="datos"></div>
+        
+        <p class="valido">Este documento es auténtico</p>
+        <small>Escaneado el: <span id="fecha"></span></small>
+    </div>
+
+    <script>
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        const dataStr = getQueryParam("data");
+        
+        if (dataStr) {
+            const datos = JSON.parse(decodeURIComponent(dataStr));
+            document.getElementById("datos").innerHTML = `
+                <div class="dato"><strong>Nombre:</strong> ${datos.nombre}</div>
+                <div class="dato"><strong>CURP:</strong> ${datos.curp}</div>
+                <div class="dato"><strong>Escuela:</strong> ${datos.escuela}</div>
+                <div class="dato"><strong>CCT:</strong> ${datos.cct}</div>
+                <div class="dato"><strong>Promedio:</strong> ${datos.promedio}</div>
+                <div class="dato"><strong>Lugar:</strong> ${datos.lugar}</div>
+                <div class="dato"><strong>Fecha:</strong> ${datos.fecha}</div>
+            `;
+            document.getElementById("fecha").textContent = new Date().toLocaleDateString('es-MX');
+        } else {
+            document.getElementById("datos").innerHTML = "<p style='color:red;'>Error: No se pudo leer el certificado.</p>";
+        }
+    </script>
+</body>
+</html>
