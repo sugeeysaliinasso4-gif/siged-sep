@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor de Certificados SEP</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            background: #f0f2f5; 
+        }
+        .container { 
+            max-width: 1100px; 
+            margin: 20px auto; 
+            background: white; 
+            border-radius: 10px; 
+            overflow: hidden; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15); 
+        }
+        .header { 
+            background: #0a2f74; 
+            color: white; 
+            padding: 20px; 
+            text-align: center; 
+        }
+        .main { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 20px; 
+            padding: 20px; 
+        }
+        .preview { 
+            flex: 1; 
+            min-width: 500px; 
+            text-align: center; 
+        }
+        canvas { 
+            max-width: 100%; 
+            border: 2px solid #ddd; 
+            border-radius: 8px; 
+        }
+        .form { 
+            flex: 1; 
+            min-width: 300px; 
+        }
+        input, button { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 8px 0; 
+            border-radius: 6px; 
+        }
+        button { 
+            background: #0a2f74; 
+            color: white; 
+            font-weight: bold; 
+            cursor: pointer; 
+        }
+        button:hover { 
+            background: #1e4a9e; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Editor de Certificados</h1>
+            <h2>Secretaría de Educación Pública</h2>
+        </div>
+
+        <div class="main">
+            <!-- Formulario -->
+            <div class="form">
+                <h3>1. Subir Plantilla del Certificado</h3>
+                <input type="file" id="plantilla" accept="image/*">
+
+                <h3>2. Datos del Certificado</h3>
+                <input type="text" id="nombre" placeholder="Nombre completo del alumno">
+                <input type="text" id="curp" placeholder="CURP">
+                <input type="text" id="escuela" placeholder="Nombre de la Escuela">
+                <input type="text" id="cct" placeholder="CCT">
+                <input type="text" id="promedio" placeholder="Promedio">
+                <input type="text" id="lugar" placeholder="Lugar (ej: Ciudad de México)">
+                <input type="date" id="fecha">
+
+                <button onclick="generarCertificado()">Generar Certificado + QR</button>
+            </div>
+
+            <!-- Vista previa -->
+            <div class="preview">
+                <h3>Vista Previa del Certificado</h3>
+                <canvas id="canvas" width="800" height="600"></canvas>
+                <div id="qrcode" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let img = new Image();
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+
+        // Cargar imagen de plantilla
+        document.getElementById("plantilla").addEventListener("change", function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    img.src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        img.onload = function() {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            dibujar();
+        };
+
+        function dibujar() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
+
+            ctx.fillStyle = "#000000";
+            ctx.font = "bold 28px Arial";
+            ctx.textAlign = "center";
+
+            // Cambia estas coordenadas (Y) según tu plantilla
+            ctx.fillText(document.getElementById("nombre").value || "NOMBRE DEL ALUMNO", canvas.width/2, 280);
+            ctx.fillText(document.getElementById("curp").value || "CURP", canvas.width/2, 330);
+            ctx.fillText(document.getElementById("escuela").value || "ESCUELA", canvas.width/2, 390);
+            ctx.fillText(document.getElementById("cct").value || "CCT", canvas.width/2, 430);
+            ctx.fillText(document.getElementById("promedio").value || "PROMEDIO", canvas.width/2, 470);
+            ctx.fillText(document.getElementById("lugar").value || "LUGAR", canvas.width/2, 520);
+            ctx.fillText(document.getElementById("fecha").value || "FECHA", canvas.width/2, 560);
+        }
+
+        // Actualizar en tiempo real
+        document.querySelectorAll("input").forEach(input => {
+            input.addEventListener("input", dibujar);
+        });
+
+        function generarCertificado() {
+            if (!img.src) {
+                alert("Primero sube una plantilla de certificado");
+                return;
+            }
+
+            dibujar();
+
+            const datos = {
+                nombre: document.getElementById("nombre").value || "Sin nombre",
+                curp: document.getElementById("curp").value,
+                escuela: document.getElementById("escuela").value,
+                cct: document.getElementById("cct").value,
+                promedio: document.getElementById("promedio").value,
+                lugar: document.getElementById("lugar").value,
+                fecha: document.getElementById("fecha").value
+            };
+
+            const dataStr = encodeURIComponent(JSON.stringify(datos));
+            const urlValidacion = window.location.origin + "/validar.html?data=" + dataStr;
+
+            // Generar QR
+            document.getElementById("qrcode").innerHTML = "";
+            new QRCode(document.getElementById("qrcode"), {
+                text: urlValidacion,
+                width: 220,
+                height: 220
+            });
+
+            // Descargar la imagen del certificado
+            const link = document.createElement("a");
+            link.download = `certificado_${datos.nombre.replace(/ /g, "_")}.png`;
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+
+            alert("✅ Certificado generado y descargado correctamente!");
+        }
+    </script>
+</body>
+</html>
+
